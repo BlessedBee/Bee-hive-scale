@@ -1,0 +1,48 @@
+substitutions:
+  name: Bee Hive Scale v1
+  devicename: beehivescalev1
+
+esphome:
+  name: $devicename
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  networks:
+  - ssid: "D6"
+    password: "T1gris!42442"
+  - ssid: "guest"
+    password: "grundfosguest08"
+   
+logger:
+
+ota:
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Budapest
+
+mqtt:
+  broker: blynk.cloud
+  port: 1883
+  username:  "device"
+  password: "MRPax-n7661_PbWCbZ1Wz45lzGIoFjBq"
+  client_id: ""
+  keepalive: 45s
+
+sensor:
+  - platform: wifi_signal
+    name: "$name - wiFi signal sensor"
+    id: wifisignal
+    update_interval: 10s
+    on_value:
+      - mqtt.publish:
+          topic: "ds/Wifi signal"
+          payload: !lambda |-
+              return to_string(id(wifisignal).state);
+      - mqtt.publish:
+          topic: "ds/Hive 1 weight"
+          payload: !lambda |-
+              auto time = id(sntp_time).now();
+              return to_string((time.day_of_year) + (time.hour) + (time.minute)) + to_string(".") + to_string(time.second);
