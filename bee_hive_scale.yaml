@@ -29,7 +29,7 @@ mqtt:
   broker: blynk.cloud
   port: 1883
   username: "device"
-  password: "MRPax-n7661_PbWCbZ1Wz45lzGIoFjBq"
+  password: "HwfhK2r6tbl7Qpgr8BaMtsQjt618o7Jf"
   client_id: ""
   keepalive: 45s
 
