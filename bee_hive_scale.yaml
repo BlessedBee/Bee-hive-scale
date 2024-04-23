@@ -26,16 +26,16 @@ time:
     timezone: Europe/Budapest
 
 mqtt:
-  broker: blynk.cloud
+  broker: lon1.blynk.cloud
   port: 1883
   username: "device"
-  password: "HwfhK2r6tbl7Qpgr8BaMtsQjt618o7Jf"
+  password: "TMsAngO-svohFyOyc9uwCoM_tuPCqOjS"
   client_id: ""
   keepalive: 45s
 
 sensor:
   - platform: wifi_signal
-    name: "$name - wiFi signal sensor"
+    name: "wiFi signal sensor - $name"
     id: wifisignal
     update_interval: 10s
     on_value:
@@ -43,8 +43,25 @@ sensor:
           topic: "ds/Wifi signal"
           payload: !lambda |-
               return to_string(id(wifisignal).state);
+  - platform: hx711
+    name: "HX711 Value - $name"
+    id: hx711_value
+    dout_pin: D1
+    clk_pin: D2
+    gain: 128
+    update_interval: 1s
+    unit_of_measurement: kg
+    filters:
+      - quantile:
+          window_size: 10
+          send_every: 1
+          send_first_at: 1
+          quantile: .9
+      - calibrate_linear:
+          - -129100 -> 0
+          - -88000 -> 1
+    on_value:
       - mqtt.publish:
           topic: "ds/Hive 1 weight"
-          payload: !lambda |-
-              auto time = id(sntp_time).now();
-              return to_string((time.day_of_year) + (time.hour) + (time.minute)) + to_string(".") + to_string(time.second);
+          payload: !lambda |- 
+            return to_string(id(hx711_value).state);
